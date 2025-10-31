@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🛍️ College Shopping Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #f1f5f9;
+      font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      transition: transform 0.2s ease;
+    }
+    .clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    #orderFormContainer {
+      transition: opacity 0.25s ease;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen p-4 sm:p-6">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl font-semibold text-center mb-6">🛒 Shopping Categories</h1>
+
+    <!-- Category Dropdown -->
+    <div id="categorySelector" class="text-center mb-6">
+      <label for="categoryDropdown" class="block text-lg mb-2">Select a category:</label>
+      <select id="categoryDropdown" class="p-2 rounded text-black w-full sm:w-64 mx-auto">
+        <option value="">-- Choose Category --</option>
+        <option value="clothes related">🧥 Clothes</option>
+        <option value="study related">📚 Study</option>
+        <option value="cosmetics related">🧴 Cosmetics</option>
+        <option value="electronics related">💻 Electronics</option>
+        <option value="others">🧺 Others</option>
+      </select>
+    </div>
+
+    <!-- Back Button -->
+    <div id="backButtonContainer" class="hidden text-center mb-6">
+      <button id="backButton" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded text-base sm:text-lg">
+        ⬅️ Back to Categories
+      </button>
+    </div>
+
+    <!-- Status -->
+    <div id="status" class="text-center text-gray-300 mb-4">Loading items…</div>
+
+    <!-- Items Section -->
+    <section id="itemsSection" class="hidden">
+      <h2 id="categoryTitle" class="text-2xl font-semibold mb-3 text-center"></h2>
+      <div id="itemsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+      <div id="loadStatus" class="text-center text-gray-400 mt-4 hidden">Loading more...</div>
+    </section>
+  </div>
+
+  <!-- ORDER FORM MODAL -->
+  <div id="orderFormContainer" class="fixed inset-0 hidden items-center justify-center bg-black/70 z-40 opacity-0">
+    <div class="bg-slate-800 rounded-2xl shadow-xl p-6 w-[92%] max-w-sm relative">
+      <h2 class="text-lg font-semibold mb-3 text-center">📝 Place Your Order</h2>
+      <form id="orderForm" class="space-y-3">
+        <input id="name" required placeholder="Your name" class="w-full p-2 rounded text-black" />
+        <select id="gender" required class="w-full p-2 rounded text-black">
+          <option value="">Select gender</option><option>Male</option><option>Female</option>
+        </select>
+        <input id="phone1" required placeholder="Phone number 1" class="w-full p-2 rounded text-black" />
+        <input id="phone2" placeholder="Phone number 2 (optional)" class="w-full p-2 rounded text-black" />
+        <div class="flex flex-col sm:flex-row gap-2">
+          <button id="submitOrder" type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 py-2 rounded font-semibold text-white">Submit</button>
+          <button id="cancelOrder" type="button" class="flex-1 bg-gray-600 hover:bg-gray-700 py-2 rounded font-semibold text-white">Cancel</button>
+        </div>
+        <p id="orderMessage" class="text-sm mt-1 text-center"></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const backendURL = "https://shopping_items_displaying_order_backend.ecetue.workers.dev";
+    const statusEl = document.getElementById("status");
+    const categoryDropdown = document.getElementById("categoryDropdown");
+    const categorySelector = document.getElementById("categorySelector");
+    const backButtonContainer = document.getElementById("backButtonContainer");
+    const backButton = document.getElementById("backButton");
+    const itemsSection = document.getElementById("itemsSection");
+    const itemsContainer = document.getElementById("itemsContainer");
+    const categoryTitle = document.getElementById("categoryTitle");
+    const loadStatus = document.getElementById("loadStatus");
+    const orderFormContainer = document.getElementById("orderFormContainer");
+    const orderForm = document.getElementById("orderForm");
+    const cancelOrder = document.getElementById("cancelOrder");
+    const submitOrderBtn = document.getElementById("submitOrder");
+    const orderMessage = document.getElementById("orderMessage");
+
+    let allItems = [];
+    let filteredItems = [];
+    let selectedItem = null;
+    let loadedCount = 0;
+    const LOAD_BATCH = 30;
+
+    const fallbackImage =
+      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%23334955'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='Arial' font-size='20'>No Image</text></svg>";
+
+    const escapeHtml = (s) => s ? String(s).replace(/[&<>\"']/g, (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])) : "";
+
+    // ✅ Fetch all items once
+    async function fetchItems() {
+      statusEl.textContent = "Loading items…";
+      try {
+        const res = await fetch(backendURL);
+        if (!res.ok) throw new Error("Backend error");
+        const data = await res.json();
+        allItems = Array.isArray(data) ? data : [];
+        statusEl.textContent = "✅ Items loaded successfully!";
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "❌ Failed to load items.";
+      }
+    }
+
+    // ✅ Category selection
+    categoryDropdown.addEventListener("change", () => {
+      const category = categoryDropdown.value;
+      if (!category) return;
+      categorySelector.classList.add("hidden");
+      backButtonContainer.classList.remove("hidden");
+      itemsSection.classList.remove("hidden");
+      startCategory(category);
+    });
+
+    // ✅ Back button
+    backButton.addEventListener("click", () => {
+      itemsContainer.innerHTML = "";
+      itemsSection.classList.add("hidden");
+      backButtonContainer.classList.add("hidden");
+      categorySelector.classList.remove("hidden");
+      categoryDropdown.value = "";
+      window.removeEventListener("scroll", handleScroll);
+    });
+
+    // ✅ Start category display
+    function startCategory(category) {
+      categoryTitle.textContent = categoryLabel(category);
+      filteredItems = allItems.filter((i) => i.type?.toLowerCase() === category);
+      itemsContainer.innerHTML = "";
+      loadedCount = 0;
+
+      if (!filteredItems.length) {
+        itemsContainer.innerHTML = `<div class='col-span-full text-center text-gray-400 p-6'>No items available.</div>`;
+        return;
+      }
+
+      loadMoreItems();
+      window.addEventListener("scroll", handleScroll);
+    }
+
+    // ✅ Infinite scroll
+    function handleScroll() {
+      if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 100)) {
+        loadMoreItems();
+      }
+    }
+
+    // ✅ Load more items (30 at a time)
+    function loadMoreItems() {
+      if (loadedCount >= filteredItems.length) return;
+      loadStatus.classList.remove("hidden");
+
+      const nextBatch = filteredItems.slice(loadedCount, loadedCount + LOAD_BATCH);
+      nextBatch.forEach(item => itemsContainer.appendChild(createCard(item)));
+
+      loadedCount += LOAD_BATCH;
+      setTimeout(() => loadStatus.classList.add("hidden"), 400);
+    }
+
+    // ✅ Category label mapping
+    function categoryLabel(key) {
+      return {
+        "clothes related": "🧥 Clothes",
+        "study related": "📚 Study",
+        "cosmetics related": "🧴 Cosmetics",
+        "electronics related": "💻 Electronics",
+        "others": "🧺 Others",
+      }[key] || "Items";
+    }
+
+    // ✅ Image resolver
+    function resolveArchiveImage(url) {
+      if (!url) return fallbackImage;
+      if (/\.(jpg|jpeg|png|gif|webp)$/i.test(url)) return url;
+      if (url.includes("archive.org/details/")) {
+        const id = url.split("details/")[1].split(/[/?#]/)[0];
+        return `https://archive.org/services/img/${id}`;
+      }
+      if (url.includes("archive.org/download/")) {
+        const id = url.split("download/")[1].split(/[/?#]/)[0];
+        return `https://archive.org/services/img/${id.split("/")[0]}`;
+      }
+      return fallbackImage;
+    }
+
+    // ✅ Create item card
+    function createCard(item) {
+      const title = item.item || "(no title)";
+      const img = resolveArchiveImage(item.archive_url);
+      const price = item.price || item.total_price || "N/A";
+      const stock = item.stock ?? "N/A";
+      const discount = item.discount || "0%";
+      const outOfStock = parseInt(stock) <= 0;
+
+      const card = document.createElement("div");
+      card.className = "card bg-slate-700 rounded-xl shadow overflow-hidden flex flex-col";
+
+      card.innerHTML = `
+        <div class='w-full h-56 bg-gray-800 overflow-hidden'>
+          <a href='${escapeHtml(item.archive_url || "#")}' target='_blank' rel='noopener noreferrer'>
+            <img src='${escapeHtml(img)}' alt='${escapeHtml(title)}' loading='lazy' class='w-full h-full object-cover hover:opacity-90 transition-opacity'>
+          </a>
+        </div>
+        <div class='p-4 flex flex-col justify-between flex-1'>
+          <div>
+            <h3 class='text-lg font-semibold mb-1 clamp-2'>${escapeHtml(title)}</h3>
+            <p class='text-sm text-gray-300 mb-1'>Price: ₹${escapeHtml(price)}</p>
+            <div class='text-xs text-gray-400'><span>Discount: ${escapeHtml(discount)}</span> • <span>Stock: ${escapeHtml(stock)}</span></div>
+          </div>
+          <div class='mt-3'>
+            <button class='order-btn w-full ${outOfStock ? "bg-gray-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"} py-2 rounded font-semibold' ${outOfStock ? "disabled" : ""}>
+              ${outOfStock ? "Out of Stock" : "Order"}
+            </button>
+          </div>
+        </div>
+      `;
+
+      card.querySelector("img").addEventListener("error", e => e.target.src = fallbackImage);
+      const btn = card.querySelector(".order-btn");
+      if (!outOfStock) btn.addEventListener("click", () => openOrderForm(item));
+
+      return card;
+    }
+
+    // ✅ Order modal logic
+    function openOrderForm(item) {
+      selectedItem = item;
+      orderForm.reset();
+      orderMessage.textContent = "";
+      orderFormContainer.classList.remove("hidden");
+      setTimeout(() => orderFormContainer.classList.add("flex", "opacity-100"), 10);
+    }
+
+    function closeOrderForm() {
+      orderFormContainer.classList.remove("opacity-100");
+      setTimeout(() => {
+        orderFormContainer.classList.add("hidden");
+        orderFormContainer.classList.remove("flex");
+      }, 200);
+    }
+
+    cancelOrder.addEventListener("click", closeOrderForm);
+    orderFormContainer.addEventListener("click", e => { if (e.target === orderFormContainer) closeOrderForm(); });
+
+    // ✅ Submit order
+    orderForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!selectedItem) return;
+
+      const name = document.getElementById("name").value.trim();
+      const gender = document.getElementById("gender").value.trim();
+      const phone1 = document.getElementById("phone1").value.trim();
+      const phone2 = document.getElementById("phone2").value.trim();
+
+      if (!name || !gender || !phone1) {
+        orderMessage.style.color = "#fca5a5";
+        orderMessage.textContent = "Please fill required fields.";
+        return;
+      }
+
+      const payload = {
+        id: selectedItem.id,
+        item: selectedItem.item,
+        type: selectedItem.type,
+        price: selectedItem.total_price || selectedItem.price || "N/A",
+        archive_url: selectedItem.archive_url,
+        name, gender,
+        phone_number_1: phone1,
+        phone_number_2: phone2 || null,
+        date: new Date().toISOString().split("T")[0],
+        stock: Math.max((parseInt(selectedItem.stock) || 0) - 1, 0),
+      };
+
+      submitOrderBtn.disabled = true;
+      submitOrderBtn.textContent = "Submitting…";
+
+      try {
+        const res = await fetch(backendURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        orderMessage.style.color = "#86efac";
+        orderMessage.textContent = "✅ Order submitted!";
+        setTimeout(closeOrderForm, 700);
+        fetchItems();
+      } catch (err) {
+        console.error(err);
+        orderMessage.style.color = "#fca5a5";
+        orderMessage.textContent = "❌ Failed to submit order.";
+      } finally {
+        submitOrderBtn.disabled = false;
+        submitOrderBtn.textContent = "Submit";
+      }
+    });
+
+    window.addEventListener("DOMContentLoaded", fetchItems);
+  </script>
+</body>
+</html>
