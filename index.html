@@ -1,41 +1,664 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🛍️ College Shopping Hub</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-
+  <meta name="description" content="Browse and order products across categories - clothes, study materials, cosmetics, electronics and more for college students." />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: #f1f5f9;
-      font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      min-height: 100vh;
+      color: #e2e8f0;
+      line-height: 1.6;
     }
-    .card:hover {
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 32px;
+    }
+
+    /* Category Selector */
+    .category-section {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .category-label {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: #94a3b8;
+    }
+
+    .select-field {
+      width: 100%;
+      max-width: 300px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 2px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .select-field:hover, .select-field:focus {
+      border-color: #14b8a6;
+      outline: none;
+    }
+
+    /* Search Bar */
+    .search-container {
+      display: flex;
+      gap: 12px;
+      max-width: 500px;
+      margin: 0 auto 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 12px 16px 12px 44px;
+      border-radius: 12px;
+      border: 2px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: #14b8a6;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: #64748b;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    .btn-primary {
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3);
+    }
+
+    .btn-secondary {
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: 2px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: #475569;
+      background: #334155;
+    }
+
+    .btn-success {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+    }
+
+    /* Back Button */
+    .back-section {
+      text-align: center;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    /* Status */
+    .status {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+
+    /* Category Title */
+    .category-title {
+      text-align: center;
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: #14b8a6;
+    }
+
+    /* Items Grid */
+    .items-section {
+      display: none;
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    /* Item Card */
+    .item-card {
+      background: linear-gradient(145deg, #1e293b, #334155);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-card:hover {
       transform: translateY(-4px);
-      transition: transform 0.2s ease;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-color: #14b8a6;
     }
-    .clamp-2 {
+
+    .image-container {
+      position: relative;
+      height: 220px;
+      background: #0f172a;
+      overflow: hidden;
+    }
+
+    .item-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .item-card:hover .item-image {
+      transform: scale(1.05);
+    }
+
+    .zoom-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.2s;
+    }
+
+    .item-card:hover .zoom-btn {
+      opacity: 1;
+    }
+
+    .zoom-btn:hover {
+      background: rgba(20, 184, 166, 0.8);
+    }
+
+    .card-content {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #f1f5f9;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    #orderFormContainer {
-      transition: opacity 0.25s ease;
+
+    .item-price {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #14b8a6;
+      margin-bottom: 12px;
+    }
+
+    /* Details Scrollable */
+    .details-scrollable {
+      max-height: 150px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+      padding-right: 8px;
+    }
+
+    .details-scrollable::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .details-scrollable::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 2px;
+    }
+
+    .details-scrollable::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 2px;
+    }
+
+    .detail-row {
+      display: flex;
+      gap: 8px;
+      font-size: 0.75rem;
+      margin-bottom: 6px;
+    }
+
+    .detail-key {
+      color: #14b8a6;
+      font-weight: 600;
+      text-transform: capitalize;
+      flex-shrink: 0;
+    }
+
+    .detail-value {
+      color: #cbd5e1;
+      word-break: break-word;
+    }
+
+    .detail-value a {
+      color: #14b8a6;
+      text-decoration: underline;
+    }
+
+    .detail-value a:hover {
+      color: #2dd4bf;
+    }
+
+    .detail-value pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.7rem;
+      color: #cbd5e1;
+      font-family: monospace;
+    }
+
+    .card-actions {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-order {
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-order:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+    }
+
+    .btn-order:disabled {
+      background: #475569;
+      cursor: not-allowed;
+    }
+
+    /* Load More */
+    .load-more {
+      text-align: center;
+      padding: 32px;
+      color: #64748b;
+      display: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #334155;
+      border-top-color: #14b8a6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Image Viewer */
+    .image-viewer-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .viewer-btn {
+      padding: 10px;
+      background: #1e293b;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .viewer-btn:hover {
+      background: #334155;
+    }
+
+    .viewer-btn.close {
+      background: #dc2626;
+    }
+
+    .viewer-btn.close:hover {
+      background: #ef4444;
+    }
+
+    .image-viewer-content {
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow: hidden;
+    }
+
+    .image-viewer-content img {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s;
+    }
+
+    .image-viewer-info {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30, 41, 59, 0.9);
+      backdrop-filter: blur(4px);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+
+    /* Archive Viewer */
+    .archive-viewer {
+      flex-direction: column;
+    }
+
+    .archive-viewer iframe {
+      width: 100%;
+      height: calc(100vh - 80px);
+      border: none;
+      border-radius: 12px;
+      margin-top: 16px;
+    }
+
+    /* Order Modal */
+    .order-modal-content {
+      background: linear-gradient(145deg, #1e293b, #334155);
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #334155;
+    }
+
+    .order-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .order-modal-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .close-modal {
+      padding: 6px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .close-modal:hover {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .order-item-name {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      margin-bottom: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .order-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 2px solid #334155;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: #14b8a6;
+      outline: none;
+    }
+
+    .input-field::placeholder {
+      color: #64748b;
+    }
+
+    .form-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .form-buttons button {
+      flex: 1;
+    }
+
+    .order-message {
+      text-align: center;
+      font-size: 0.875rem;
+      min-height: 20px;
+    }
+
+    .order-message.success {
+      color: #22c55e;
+    }
+
+    .order-message.error {
+      color: #ef4444;
+    }
+
+    /* No Items */
+    .no-items {
+      text-align: center;
+      padding: 48px;
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.75rem;
+      }
+
+      .items-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .search-container {
+        flex-direction: column;
+      }
+
+      .search-wrapper {
+        width: 100%;
+      }
+
+      .btn-primary {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
 
-<body class="min-h-screen p-4 sm:p-6">
-  <div class="max-w-7xl mx-auto">
-    <h1 class="text-3xl font-semibold text-center mb-6">🛒 Shopping Categories</h1>
+<body>
+  <div class="container">
+    <h1>🛒 College Shopping Hub</h1>
+    <p class="subtitle">Browse and order products across categories</p>
 
-    <!-- Category Dropdown -->
-    <div id="categorySelector" class="text-center mb-6">
-      <label for="categoryDropdown" class="block text-lg mb-2">Select a category:</label>
-      <select id="categoryDropdown" class="p-2 rounded text-black w-full sm:w-64 mx-auto">
+    <!-- Global Search (before category selection) -->
+    <div id="globalSearch" class="search-container">
+      <div class="search-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input type="text" id="globalSearchInput" class="search-input" placeholder="Search by ID or item name...">
+      </div>
+      <button id="globalSearchBtn" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        Search
+      </button>
+    </div>
+
+    <!-- Category Selector -->
+    <div id="categorySection" class="category-section">
+      <label class="category-label">Select a category:</label>
+      <select id="categoryDropdown" class="select-field">
         <option value="">-- Choose Category --</option>
         <option value="clothes related">🧥 Clothes</option>
         <option value="study related">📚 Study</option>
@@ -46,240 +669,522 @@
     </div>
 
     <!-- Back Button -->
-    <div id="backButtonContainer" class="hidden text-center mb-6">
-      <button id="backButton" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded text-base sm:text-lg">
-        ⬅️ Back to Categories
-      </button>
+    <div id="backSection" class="back-section">
+      <button id="backBtn" class="btn-secondary">⬅️ Back to Categories</button>
     </div>
 
     <!-- Status -->
-    <div id="status" class="text-center text-gray-300 mb-4">Loading items…</div>
+    <div id="status" class="status">Loading items…</div>
 
     <!-- Items Section -->
-    <section id="itemsSection" class="hidden">
-      <h2 id="categoryTitle" class="text-2xl font-semibold mb-3 text-center"></h2>
-      <div id="itemsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
-      <div id="loadStatus" class="text-center text-gray-400 mt-4 hidden">Loading more...</div>
+    <section id="itemsSection" class="items-section">
+      <h2 id="categoryTitle" class="category-title"></h2>
+      
+      <!-- Category Search -->
+      <div id="categorySearch" class="search-container">
+        <div class="search-wrapper">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input type="text" id="categorySearchInput" class="search-input" placeholder="Search within category...">
+        </div>
+        <button id="categorySearchBtn" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          Search
+        </button>
+      </div>
+
+      <div id="itemsGrid" class="items-grid"></div>
+      <div id="loadMore" class="load-more">
+        <span class="spinner"></span>
+        Loading more items...
+      </div>
     </section>
   </div>
 
-  <!-- ORDER FORM MODAL -->
-  <div id="orderFormContainer" class="fixed inset-0 hidden items-center justify-center bg-black/70 z-40 opacity-0">
-    <div class="bg-slate-800 rounded-2xl shadow-xl p-6 w-[92%] max-w-sm relative">
-      <h2 class="text-lg font-semibold mb-3 text-center">📝 Place Your Order</h2>
-      <form id="orderForm" class="space-y-3">
-        <input id="name" required placeholder="Your name" class="w-full p-2 rounded text-black" />
-        <select id="gender" required class="w-full p-2 rounded text-black">
-          <option value="">Select gender</option><option>Male</option><option>Female</option>
+  <!-- Image Viewer Modal -->
+  <div id="imageViewer" class="modal-overlay">
+    <div class="image-viewer-controls">
+      <button id="zoomInBtn" class="viewer-btn" title="Zoom in (+)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+          <path d="M11 8v6M8 11h6"></path>
+        </svg>
+      </button>
+      <button id="zoomOutBtn" class="viewer-btn" title="Zoom out (-)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+          <path d="M8 11h6"></path>
+        </svg>
+      </button>
+      <button id="rotateBtn" class="viewer-btn" title="Rotate">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
+          <path d="M21 3v5h-5"></path>
+        </svg>
+      </button>
+      <button id="closeImageBtn" class="viewer-btn close" title="Close (Esc)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="image-viewer-content">
+      <img id="viewerImage" src="" alt="">
+    </div>
+    <div class="image-viewer-info">
+      Zoom: <span id="zoomLevel">100</span>% | Use +/- keys to zoom
+    </div>
+  </div>
+
+  <!-- Archive Viewer Modal -->
+  <div id="archiveViewer" class="modal-overlay archive-viewer">
+    <button id="closeArchiveBtn" class="viewer-btn close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6 6 18M6 6l12 12"></path>
+      </svg>
+      Close
+    </button>
+    <iframe id="archiveFrame" src=""></iframe>
+  </div>
+
+  <!-- Order Modal -->
+  <div id="orderModal" class="modal-overlay">
+    <div class="order-modal-content">
+      <div class="order-modal-header">
+        <h2>📝 Place Your Order</h2>
+        <button id="closeOrderBtn" class="close-modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <p id="orderItemName" class="order-item-name"></p>
+      <form id="orderForm" class="order-form">
+        <input type="text" id="nameInput" class="input-field" placeholder="Your name *" required>
+        <select id="genderInput" class="input-field" required>
+          <option value="">Select gender *</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
         </select>
-        <input id="phone1" required placeholder="Phone number 1" class="w-full p-2 rounded text-black" />
-        <input id="phone2" placeholder="Phone number 2 (optional)" class="w-full p-2 rounded text-black" />
-        <div class="flex flex-col sm:flex-row gap-2">
-          <button id="submitOrder" type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 py-2 rounded font-semibold text-white">Submit</button>
-          <button id="cancelOrder" type="button" class="flex-1 bg-gray-600 hover:bg-gray-700 py-2 rounded font-semibold text-white">Cancel</button>
+        <input type="tel" id="phone1Input" class="input-field" placeholder="Phone number 1 *" required>
+        <input type="tel" id="phone2Input" class="input-field" placeholder="Phone number 2 (optional)">
+        <p id="orderMessage" class="order-message"></p>
+        <div class="form-buttons">
+          <button type="submit" id="submitOrderBtn" class="btn-primary">Submit Order</button>
+          <button type="button" id="cancelOrderBtn" class="btn-secondary">Cancel</button>
         </div>
-        <p id="orderMessage" class="text-sm mt-1 text-center"></p>
       </form>
     </div>
   </div>
 
   <script>
-    const backendURL = "https://shopping_items_displaying_order_backend.ecetue.workers.dev";
-    const statusEl = document.getElementById("status");
-    const categoryDropdown = document.getElementById("categoryDropdown");
-    const categorySelector = document.getElementById("categorySelector");
-    const backButtonContainer = document.getElementById("backButtonContainer");
-    const backButton = document.getElementById("backButton");
-    const itemsSection = document.getElementById("itemsSection");
-    const itemsContainer = document.getElementById("itemsContainer");
-    const categoryTitle = document.getElementById("categoryTitle");
-    const loadStatus = document.getElementById("loadStatus");
-    const orderFormContainer = document.getElementById("orderFormContainer");
-    const orderForm = document.getElementById("orderForm");
-    const cancelOrder = document.getElementById("cancelOrder");
-    const submitOrderBtn = document.getElementById("submitOrder");
-    const orderMessage = document.getElementById("orderMessage");
+    // Configuration
+    const BACKEND_URL = "https://shopping_items_displaying_order_backend.ecetue.workers.dev";
+    const LOAD_BATCH = 30;
+    const FALLBACK_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%231e293b'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='Arial' font-size='18'>No Image</text></svg>";
 
+    // State
     let allItems = [];
     let filteredItems = [];
-    let selectedItem = null;
     let loadedCount = 0;
-    const LOAD_BATCH = 30;
+    let selectedItem = null;
+    let imageScale = 1;
+    let imageRotation = 0;
+    let isSearchMode = false;
 
-    const fallbackImage =
-      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%23334955'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='Arial' font-size='20'>No Image</text></svg>";
+    // DOM Elements
+    const statusEl = document.getElementById('status');
+    const categorySection = document.getElementById('categorySection');
+    const categoryDropdown = document.getElementById('categoryDropdown');
+    const backSection = document.getElementById('backSection');
+    const backBtn = document.getElementById('backBtn');
+    const itemsSection = document.getElementById('itemsSection');
+    const itemsGrid = document.getElementById('itemsGrid');
+    const categoryTitle = document.getElementById('categoryTitle');
+    const loadMore = document.getElementById('loadMore');
+    const globalSearch = document.getElementById('globalSearch');
+    const globalSearchInput = document.getElementById('globalSearchInput');
+    const globalSearchBtn = document.getElementById('globalSearchBtn');
+    const categorySearch = document.getElementById('categorySearch');
+    const categorySearchInput = document.getElementById('categorySearchInput');
+    const categorySearchBtn = document.getElementById('categorySearchBtn');
 
-    const escapeHtml = (s) => s ? String(s).replace(/[&<>\"']/g, (c) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])) : "";
+    // Image Viewer
+    const imageViewer = document.getElementById('imageViewer');
+    const viewerImage = document.getElementById('viewerImage');
+    const zoomLevel = document.getElementById('zoomLevel');
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const rotateBtn = document.getElementById('rotateBtn');
+    const closeImageBtn = document.getElementById('closeImageBtn');
 
-    // ✅ Fetch all items once
+    // Archive Viewer
+    const archiveViewer = document.getElementById('archiveViewer');
+    const archiveFrame = document.getElementById('archiveFrame');
+    const closeArchiveBtn = document.getElementById('closeArchiveBtn');
+
+    // Order Modal
+    const orderModal = document.getElementById('orderModal');
+    const orderItemName = document.getElementById('orderItemName');
+    const orderForm = document.getElementById('orderForm');
+    const orderMessage = document.getElementById('orderMessage');
+    const closeOrderBtn = document.getElementById('closeOrderBtn');
+    const cancelOrderBtn = document.getElementById('cancelOrderBtn');
+    const submitOrderBtn = document.getElementById('submitOrderBtn');
+
+    // Category labels
+    const CATEGORY_LABELS = {
+      "clothes related": "🧥 Clothes",
+      "study related": "📚 Study",
+      "cosmetics related": "🧴 Cosmetics",
+      "electronics related": "💻 Electronics",
+      "others": "🧺 Others"
+    };
+
+    // Utility: Resolve archive image URL
+    function resolveArchiveImage(url) {
+      if (!url) return FALLBACK_IMAGE;
+      if (/\.(jpg|jpeg|png|gif|webp)$/i.test(url)) return url;
+      if (url.includes("archive.org/details/")) {
+        const id = url.split("details/")[1]?.split(/[/?#]/)[0];
+        if (id) return `https://archive.org/services/img/${id}`;
+      }
+      if (url.includes("archive.org/download/")) {
+        const id = url.split("download/")[1]?.split(/[/?#]/)[0];
+        if (id) return `https://archive.org/services/img/${id.split("/")[0]}`;
+      }
+      return FALLBACK_IMAGE;
+    }
+
+    // Utility: Convert URLs in text to clickable links
+    function linkifyText(text) {
+      if (text === null || text === undefined) return 'N/A';
+      const str = String(text);
+      const urlRegex = /(https?:\/\/[^\s<>]+)|(www\.[^\s<>]+)/gi;
+      return str.replace(urlRegex, (url) => {
+        let href = url;
+        if (!/^https?:\/\//i.test(href)) href = 'https://' + href;
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+      });
+    }
+
+    // Utility: Escape HTML
+    function escapeHtml(text) {
+      if (text === null || text === undefined) return 'N/A';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Fetch items from backend
     async function fetchItems() {
       statusEl.textContent = "Loading items…";
       try {
-        const res = await fetch(backendURL);
-        if (!res.ok) throw new Error("Backend error");
+        const res = await fetch(BACKEND_URL);
+        if (!res.ok) throw new Error("Backend error: " + res.status);
         const data = await res.json();
-        allItems = Array.isArray(data) ? data : [];
+        // Sort by ID descending (latest first)
+        allItems = Array.isArray(data) ? data.sort((a, b) => {
+          const idA = parseInt(a.id) || 0;
+          const idB = parseInt(b.id) || 0;
+          return idB - idA;
+        }) : [];
         statusEl.textContent = "✅ Items loaded successfully!";
       } catch (err) {
         console.error(err);
         statusEl.textContent = "❌ Failed to load items.";
+        allItems = [];
       }
     }
 
-    // ✅ Category selection
-    categoryDropdown.addEventListener("change", () => {
-      const category = categoryDropdown.value;
-      if (!category) return;
-      categorySelector.classList.add("hidden");
-      backButtonContainer.classList.remove("hidden");
-      itemsSection.classList.remove("hidden");
-      startCategory(category);
-    });
-
-    // ✅ Back button
-    backButton.addEventListener("click", () => {
-      itemsContainer.innerHTML = "";
-      itemsSection.classList.add("hidden");
-      backButtonContainer.classList.add("hidden");
-      categorySelector.classList.remove("hidden");
-      categoryDropdown.value = "";
-      window.removeEventListener("scroll", handleScroll);
-    });
-
-    // ✅ Start category display
-    function startCategory(category) {
-      categoryTitle.textContent = categoryLabel(category);
-      filteredItems = allItems.filter((i) => i.type?.toLowerCase() === category);
-      itemsContainer.innerHTML = "";
-      loadedCount = 0;
-
-      if (!filteredItems.length) {
-        itemsContainer.innerHTML = `<div class='col-span-full text-center text-gray-400 p-6'>No items available.</div>`;
-        return;
+    // Build details HTML for an item
+    function buildDetailsHtml(item) {
+      const excludeKeys = ['item', 'archive_url'];
+      let html = '<div class="details-scrollable">';
+      
+      for (const [key, value] of Object.entries(item)) {
+        if (excludeKeys.includes(key)) continue;
+        
+        const displayKey = key.replace(/_/g, ' ');
+        let displayValue;
+        
+        if (value === null || value === undefined) {
+          displayValue = '<span style="color: #64748b;">N/A</span>';
+        } else if (typeof value === 'object') {
+          displayValue = `<pre>${escapeHtml(JSON.stringify(value, null, 2))}</pre>`;
+        } else {
+          displayValue = linkifyText(escapeHtml(String(value)));
+        }
+        
+        html += `
+          <div class="detail-row">
+            <span class="detail-key">${escapeHtml(displayKey)}:</span>
+            <span class="detail-value">${displayValue}</span>
+          </div>
+        `;
       }
-
-      loadMoreItems();
-      window.addEventListener("scroll", handleScroll);
+      
+      html += '</div>';
+      return html;
     }
 
-    // ✅ Infinite scroll
-    function handleScroll() {
-      if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 100)) {
-        loadMoreItems();
-      }
-    }
-
-    // ✅ Load more items (30 at a time)
-    function loadMoreItems() {
-      if (loadedCount >= filteredItems.length) return;
-      loadStatus.classList.remove("hidden");
-
-      const nextBatch = filteredItems.slice(loadedCount, loadedCount + LOAD_BATCH);
-      nextBatch.forEach(item => itemsContainer.appendChild(createCard(item)));
-
-      loadedCount += LOAD_BATCH;
-      setTimeout(() => loadStatus.classList.add("hidden"), 400);
-    }
-
-    // ✅ Category label mapping
-    function categoryLabel(key) {
-      return {
-        "clothes related": "🧥 Clothes",
-        "study related": "📚 Study",
-        "cosmetics related": "🧴 Cosmetics",
-        "electronics related": "💻 Electronics",
-        "others": "🧺 Others",
-      }[key] || "Items";
-    }
-
-    // ✅ Image resolver
-    function resolveArchiveImage(url) {
-      if (!url) return fallbackImage;
-      if (/\.(jpg|jpeg|png|gif|webp)$/i.test(url)) return url;
-      if (url.includes("archive.org/details/")) {
-        const id = url.split("details/")[1].split(/[/?#]/)[0];
-        return `https://archive.org/services/img/${id}`;
-      }
-      if (url.includes("archive.org/download/")) {
-        const id = url.split("download/")[1].split(/[/?#]/)[0];
-        return `https://archive.org/services/img/${id.split("/")[0]}`;
-      }
-      return fallbackImage;
-    }
-
-    // ✅ Create item card
+    // Create item card
     function createCard(item) {
       const title = item.item || "(no title)";
-      const img = resolveArchiveImage(item.archive_url);
+      const imgSrc = resolveArchiveImage(item.archive_url);
       const price = item.price || item.total_price || "N/A";
-      const stock = item.stock ?? "N/A";
-      const discount = item.discount || "0%";
-      const outOfStock = parseInt(stock) <= 0;
+      const stock = item.stock;
+      const stockNum = typeof stock === 'number' ? stock : parseInt(String(stock));
+      const outOfStock = !isNaN(stockNum) && stockNum <= 0;
 
-      const card = document.createElement("div");
-      card.className = "card bg-slate-700 rounded-xl shadow overflow-hidden flex flex-col";
-
+      const card = document.createElement('div');
+      card.className = 'item-card';
+      
       card.innerHTML = `
-        <div class='w-full h-56 bg-gray-800 overflow-hidden'>
-          <a href='${escapeHtml(item.archive_url || "#")}' target='_blank' rel='noopener noreferrer'>
-            <img src='${escapeHtml(img)}' alt='${escapeHtml(title)}' loading='lazy' class='w-full h-full object-cover hover:opacity-90 transition-opacity'>
-          </a>
+        <div class="image-container">
+          <img src="${imgSrc}" alt="${escapeHtml(title)}" class="item-image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'">
+          <button class="zoom-btn" title="View fullscreen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m21 21-6-6m6 6v-4.8m0 4.8h-4.8"></path>
+              <path d="M3 16.2V21m0 0h4.8M3 21l6-6"></path>
+              <path d="M21 7.8V3m0 0h-4.8M21 3l-6 6"></path>
+              <path d="M3 7.8V3m0 0h4.8M3 3l6 6"></path>
+            </svg>
+          </button>
         </div>
-        <div class='p-4 flex flex-col justify-between flex-1'>
-          <div>
-            <h3 class='text-lg font-semibold mb-1 clamp-2'>${escapeHtml(title)}</h3>
-            <p class='text-sm text-gray-300 mb-1'>Price: ₹${escapeHtml(price)}</p>
-            <div class='text-xs text-gray-400'><span>Discount: ${escapeHtml(discount)}</span> • <span>Stock: ${escapeHtml(stock)}</span></div>
-          </div>
-          <div class='mt-3'>
-            <button class='order-btn w-full ${outOfStock ? "bg-gray-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"} py-2 rounded font-semibold' ${outOfStock ? "disabled" : ""}>
-              ${outOfStock ? "Out of Stock" : "Order"}
+        <div class="card-content">
+          <h3 class="item-title">${escapeHtml(title)}</h3>
+          <div class="item-price">₹${escapeHtml(String(price))}</div>
+          ${buildDetailsHtml(item)}
+          <div class="card-actions">
+            ${item.archive_url ? `
+              <button class="btn-success archive-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                View in Archive
+              </button>
+            ` : ''}
+            <button class="btn-order order-btn" ${outOfStock ? 'disabled' : ''}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+              ${outOfStock ? 'Out of Stock' : 'Order Now'}
             </button>
           </div>
         </div>
       `;
 
-      card.querySelector("img").addEventListener("error", e => e.target.src = fallbackImage);
-      const btn = card.querySelector(".order-btn");
-      if (!outOfStock) btn.addEventListener("click", () => openOrderForm(item));
+      // Event listeners
+      const zoomBtn = card.querySelector('.zoom-btn');
+      zoomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openImageViewer(imgSrc, title);
+      });
+
+      const archiveBtn = card.querySelector('.archive-btn');
+      if (archiveBtn) {
+        archiveBtn.addEventListener('click', () => openArchiveViewer(item.archive_url));
+      }
+
+      const orderBtn = card.querySelector('.order-btn');
+      if (!outOfStock) {
+        orderBtn.addEventListener('click', () => openOrderModal(item));
+      }
 
       return card;
     }
 
-    // ✅ Order modal logic
-    function openOrderForm(item) {
-      selectedItem = item;
-      orderForm.reset();
-      orderMessage.textContent = "";
-      orderFormContainer.classList.remove("hidden");
-      setTimeout(() => orderFormContainer.classList.add("flex", "opacity-100"), 10);
+    // Render items
+    function renderItems(items) {
+      itemsGrid.innerHTML = '';
+      loadedCount = 0;
+      filteredItems = items;
+      
+      if (items.length === 0) {
+        itemsGrid.innerHTML = '<div class="no-items">No items found.</div>';
+        return;
+      }
+      
+      loadMoreItems();
     }
 
-    function closeOrderForm() {
-      orderFormContainer.classList.remove("opacity-100");
+    // Load more items (infinite scroll)
+    function loadMoreItems() {
+      if (loadedCount >= filteredItems.length) return;
+      
+      loadMore.style.display = 'block';
+      
+      const nextBatch = filteredItems.slice(loadedCount, loadedCount + LOAD_BATCH);
+      nextBatch.forEach(item => itemsGrid.appendChild(createCard(item)));
+      
+      loadedCount += LOAD_BATCH;
+      
       setTimeout(() => {
-        orderFormContainer.classList.add("hidden");
-        orderFormContainer.classList.remove("flex");
-      }, 200);
+        loadMore.style.display = 'none';
+      }, 300);
     }
 
-    cancelOrder.addEventListener("click", closeOrderForm);
-    orderFormContainer.addEventListener("click", e => { if (e.target === orderFormContainer) closeOrderForm(); });
+    // Handle scroll for infinite loading
+    function handleScroll() {
+      if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 200)) {
+        loadMoreItems();
+      }
+    }
 
-    // ✅ Submit order
-    orderForm.addEventListener("submit", async (e) => {
+    // Show category items
+    function showCategory(category) {
+      const items = allItems.filter(i => (i.type || '').toLowerCase() === category);
+      categoryTitle.textContent = CATEGORY_LABELS[category] || 'Items';
+      categorySearchInput.value = '';
+      renderItems(items);
+      
+      categorySection.style.display = 'none';
+      globalSearch.style.display = 'none';
+      backSection.style.display = 'block';
+      itemsSection.style.display = 'block';
+      isSearchMode = false;
+      
+      window.addEventListener('scroll', handleScroll);
+    }
+
+    // Global search
+    function performGlobalSearch(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) return;
+      
+      const results = allItems.filter(item => {
+        const idMatch = String(item.id).toLowerCase().includes(q);
+        const nameMatch = (item.item || '').toLowerCase().includes(q);
+        return idMatch || nameMatch;
+      });
+      
+      categoryTitle.textContent = `🔍 Search Results for "${query}"`;
+      categorySearchInput.value = '';
+      renderItems(results);
+      
+      categorySection.style.display = 'none';
+      globalSearch.style.display = 'none';
+      backSection.style.display = 'block';
+      itemsSection.style.display = 'block';
+      isSearchMode = true;
+      
+      window.addEventListener('scroll', handleScroll);
+    }
+
+    // Category search
+    function performCategorySearch(query) {
+      const q = query.toLowerCase().trim();
+      const category = categoryDropdown.value;
+      
+      let items;
+      if (isSearchMode) {
+        // Search within current filtered results
+        items = filteredItems.filter(item => {
+          const idMatch = String(item.id).toLowerCase().includes(q);
+          const nameMatch = (item.item || '').toLowerCase().includes(q);
+          return idMatch || nameMatch;
+        });
+      } else {
+        // Search within category
+        items = allItems.filter(i => (i.type || '').toLowerCase() === category);
+        if (q) {
+          items = items.filter(item => {
+            const idMatch = String(item.id).toLowerCase().includes(q);
+            const nameMatch = (item.item || '').toLowerCase().includes(q);
+            return idMatch || nameMatch;
+          });
+        }
+      }
+      
+      renderItems(items);
+    }
+
+    // Back to categories
+    function goBack() {
+      itemsGrid.innerHTML = '';
+      itemsSection.style.display = 'none';
+      backSection.style.display = 'none';
+      categorySection.style.display = 'block';
+      globalSearch.style.display = 'flex';
+      categoryDropdown.value = '';
+      globalSearchInput.value = '';
+      isSearchMode = false;
+      
+      window.removeEventListener('scroll', handleScroll);
+    }
+
+    // Image Viewer
+    function openImageViewer(src, alt) {
+      imageScale = 1;
+      imageRotation = 0;
+      viewerImage.src = src;
+      viewerImage.alt = alt;
+      updateImageTransform();
+      imageViewer.classList.add('active');
+    }
+
+    function closeImageViewer() {
+      imageViewer.classList.remove('active');
+      viewerImage.src = '';
+    }
+
+    function updateImageTransform() {
+      viewerImage.style.transform = `scale(${imageScale}) rotate(${imageRotation}deg)`;
+      zoomLevel.textContent = Math.round(imageScale * 100);
+    }
+
+    // Archive Viewer
+    function openArchiveViewer(url) {
+      archiveFrame.src = url;
+      archiveViewer.classList.add('active');
+    }
+
+    function closeArchiveViewer() {
+      archiveViewer.classList.remove('active');
+      archiveFrame.src = '';
+    }
+
+    // Order Modal
+    function openOrderModal(item) {
+      selectedItem = item;
+      orderItemName.textContent = `Item: ${item.item}`;
+      orderForm.reset();
+      orderMessage.textContent = '';
+      orderMessage.className = 'order-message';
+      orderModal.classList.add('active');
+    }
+
+    function closeOrderModal() {
+      orderModal.classList.remove('active');
+      selectedItem = null;
+    }
+
+    async function submitOrder(e) {
       e.preventDefault();
       if (!selectedItem) return;
 
-      const name = document.getElementById("name").value.trim();
-      const gender = document.getElementById("gender").value.trim();
-      const phone1 = document.getElementById("phone1").value.trim();
-      const phone2 = document.getElementById("phone2").value.trim();
+      const name = document.getElementById('nameInput').value.trim();
+      const gender = document.getElementById('genderInput').value;
+      const phone1 = document.getElementById('phone1Input').value.trim();
+      const phone2 = document.getElementById('phone2Input').value.trim();
 
       if (!name || !gender || !phone1) {
-        orderMessage.style.color = "#fca5a5";
-        orderMessage.textContent = "Please fill required fields.";
+        orderMessage.textContent = 'Please fill all required fields.';
+        orderMessage.className = 'order-message error';
         return;
       }
 
@@ -289,7 +1194,8 @@
         type: selectedItem.type,
         price: selectedItem.total_price || selectedItem.price || "N/A",
         archive_url: selectedItem.archive_url,
-        name, gender,
+        name,
+        gender,
         phone_number_1: phone1,
         phone_number_2: phone2 || null,
         date: new Date().toISOString().split("T")[0],
@@ -297,30 +1203,113 @@
       };
 
       submitOrderBtn.disabled = true;
-      submitOrderBtn.textContent = "Submitting…";
+      submitOrderBtn.textContent = 'Submitting...';
 
       try {
-        const res = await fetch(backendURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const res = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
+        
         if (!res.ok) throw new Error(await res.text());
-        orderMessage.style.color = "#86efac";
-        orderMessage.textContent = "✅ Order submitted!";
-        setTimeout(closeOrderForm, 700);
-        fetchItems();
+        
+        orderMessage.textContent = '✅ Order submitted successfully!';
+        orderMessage.className = 'order-message success';
+        
+        setTimeout(() => {
+          closeOrderModal();
+          fetchItems().then(() => {
+            if (categoryDropdown.value && !isSearchMode) {
+              const items = allItems.filter(i => (i.type || '').toLowerCase() === categoryDropdown.value);
+              renderItems(items);
+            }
+          });
+        }, 1000);
       } catch (err) {
         console.error(err);
-        orderMessage.style.color = "#fca5a5";
-        orderMessage.textContent = "❌ Failed to submit order.";
+        orderMessage.textContent = '❌ Failed to submit order.';
+        orderMessage.className = 'order-message error';
       } finally {
         submitOrderBtn.disabled = false;
-        submitOrderBtn.textContent = "Submit";
+        submitOrderBtn.textContent = 'Submit Order';
+      }
+    }
+
+    // Event Listeners
+    categoryDropdown.addEventListener('change', () => {
+      const category = categoryDropdown.value;
+      if (category) showCategory(category);
+    });
+
+    backBtn.addEventListener('click', goBack);
+
+    globalSearchBtn.addEventListener('click', () => performGlobalSearch(globalSearchInput.value));
+    globalSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') performGlobalSearch(globalSearchInput.value);
+    });
+
+    categorySearchBtn.addEventListener('click', () => performCategorySearch(categorySearchInput.value));
+    categorySearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') performCategorySearch(categorySearchInput.value);
+    });
+
+    // Image viewer controls
+    zoomInBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      imageScale = Math.min(imageScale + 0.5, 4);
+      updateImageTransform();
+    });
+
+    zoomOutBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      imageScale = Math.max(imageScale - 0.5, 0.5);
+      updateImageTransform();
+    });
+
+    rotateBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      imageRotation = (imageRotation + 90) % 360;
+      updateImageTransform();
+    });
+
+    closeImageBtn.addEventListener('click', closeImageViewer);
+    imageViewer.addEventListener('click', (e) => {
+      if (e.target === imageViewer) closeImageViewer();
+    });
+
+    // Archive viewer
+    closeArchiveBtn.addEventListener('click', closeArchiveViewer);
+
+    // Order modal
+    closeOrderBtn.addEventListener('click', closeOrderModal);
+    cancelOrderBtn.addEventListener('click', closeOrderModal);
+    orderModal.addEventListener('click', (e) => {
+      if (e.target === orderModal) closeOrderModal();
+    });
+    orderForm.addEventListener('submit', submitOrder);
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeImageViewer();
+        closeArchiveViewer();
+        closeOrderModal();
+      }
+      if (imageViewer.classList.contains('active')) {
+        if (e.key === '+' || e.key === '=') {
+          imageScale = Math.min(imageScale + 0.25, 4);
+          updateImageTransform();
+        }
+        if (e.key === '-') {
+          imageScale = Math.max(imageScale - 0.25, 0.5);
+          updateImageTransform();
+        }
       }
     });
 
-    window.addEventListener("DOMContentLoaded", fetchItems);
+    // Initialize
+    window.addEventListener('DOMContentLoaded', fetchItems);
   </script>
 </body>
 </html>
